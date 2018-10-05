@@ -1,10 +1,12 @@
 FROM ubuntu:18.04
-LABEL maintainer="Javier Santos"
+LABEL maintainer="AbandonedCart"
 
 ENV VERSION_SDK_TOOLS "3859397"
 
 ENV ANDROID_HOME "/sdk"
-ENV PATH "$PATH:${ANDROID_HOME}/tools"
+ENV ANDROID_NDK "$ANDROID_HOME/ndk-bundle"
+ENV ANDROID_NDK_HOME "$ANDROID_NDK"
+ENV PATH "$PATH:${ANDROID_HOME}/tools:${ANDROID_NDK}"
 ENV DEBIAN_FRONTEND noninteractive
 
 RUN apt-get -qq update && \
@@ -19,6 +21,7 @@ RUN apt-get -qq update && \
       lib32gcc1 \
       lib32ncurses5 \
       lib32z1 \
+      make \
       unzip \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
@@ -40,3 +43,5 @@ RUN mkdir -p /root/.android && \
 
 RUN while read -r package; do PACKAGES="${PACKAGES}${package} "; done < /sdk/packages.txt && \
     ${ANDROID_HOME}/tools/bin/sdkmanager ${PACKAGES}
+
+RUN echo y | ${ANDROID_HOME}/tools/bin/sdkmanager 'ndk-bundle'
